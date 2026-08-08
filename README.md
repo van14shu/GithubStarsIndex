@@ -8,7 +8,7 @@
 
 - [功能特性](#功能特性)
 - [快速开始](#快速开始)
-- [配置项详解](#配置项详解-环境变量--env)
+- [配置项详解](#配置项详解)
 - [Obsidian 同步（可选）](#obsidian-同步可选)
 - [本地运行](#本地运行)
 
@@ -76,25 +76,55 @@ graph TD
 > [!IMPORTANT]
 > 本站模板已内置 `analytics.1step.dev` 网站分析脚本，默认 `data-website-id` 为 `GitHubStarsIndex`。Fork 后请改成你自己的站点 ID，或直接删除 `templates/index.html.j2` 底部的脚本，避免统计数据混入原项目仪表板。
 
-### 第二步：配置环境 (二选一)
+### 第二步：配置运行环境（二选一）
 
-本项目通过环境变量驱动，**配置优先级：GitHub Secrets > .env 文件**。
+本项目通过环境变量驱动。脚本的配置优先级为：**内置默认值 < `config.yml` < 环境变量**；本地 `.env` 会被加载为环境变量。GitHub Actions 则通过工作流把 Repository Secrets/Variables 注入为环境变量。
 
-#### 方案 A：使用 GitHub 环境变量 (推荐，适合持续运行)
+#### 方案 A：GitHub Actions（推荐，适合持续运行）
 
-进入仓库的 **Settings → Secrets and variables → Actions** 进行配置：
+进入你 Fork 后仓库的 **Settings → Secrets and variables → Actions**。
 
-**🔐 必填项 (Required Secrets/Variables)**
-- `GH_USERNAME`: 要抓取 Stars 的 GitHub 用户名。
-- `AI_API_KEY`: 你的 AI 接口 API Key。
+> [!IMPORTANT]
+> - **Secrets** 用于 API Key、Token 等敏感值，通过 `${{ secrets.NAME }}` 读取；**Variables** 用于用户名、模型名、URL、开关等非敏感配置，通过 `${{ vars.NAME }}` 读取。两者是不同命名空间，同名 Secret 不会自动成为 Variable。
+> - 当前工作流没有声明 `environment:`，因此请创建 **Repository secrets / Repository variables**，不要创建 Environment 级别配置。
+> - 未创建的 Repository Variable 会以空字符串传入工作流。为避免空值覆盖脚本默认值，下面列出的基础 Variables 请显式创建。
 
-**📋 可选项 (Optional Variables)**
-以下参数有内置默认值，通常无需配置：
-- `AI_BASE_URL`: AI 接口地址 (默认使用 OpenAI 官方地址)。
-- `AI_MODEL`: 模型名称 (默认 `gpt-4o-mini`)。
-- `OUTPUT_FILENAME`: 生成文件的基准名 (默认 `stars`)。
-- `VAULT_SYNC_PATH`: Vault 里的存放目录 (默认 `GitHub-Stars/`)。
-- `PAGES_SYNC_ENABLED`: 是否同步到 Pages (默认 `true`)。
+**Repository secrets**
+
+| 名称 | 是否必填 | 说明 |
+| --- | --- | --- |
+| `AI_API_KEY` | 必填 | AI 服务商 API Key |
+| `VAULT_PAT` | 条件必填 | 仅开启 Obsidian Vault 跨仓库同步时需要；目标仓库需有 Contents: Write 权限 |
+| `GITHUB_TOKEN` | 无需创建 | GitHub Actions 会为每个 Job 自动生成，工作流已自动注入 |
+
+**Repository variables**
+
+| 名称 | 建议值 | 说明 |
+| --- | --- | --- |
+| `GH_USERNAME` | 你的 GitHub 用户名 | 要抓取 Stars 的账号；必须放在 Variables |
+| `AI_BASE_URL` | 见下方服务商示例 | OpenAI 兼容接口地址 |
+| `AI_MODEL` | 见下方服务商示例 | 服务商提供的模型 ID |
+| `MAX_CONCURRENCY` | `1` | 首次全量同步或订阅制/Token Plan API 建议从 1 开始 |
+| `OUTPUT_FILENAME` | `stars` | 生成 `stars_zh.md` / `stars_en.md` |
+| `PAGES_SYNC_ENABLED` | `true` | 发布 GitHub Pages；不配置时不会发布 |
+| `VAULT_SYNC_ENABLED` | `false` | 是否同步到 Obsidian Vault |
+| `VAULT_REPO` | `owner/repo` | 仅开启 Vault 同步时填写 |
+| `VAULT_SYNC_PATH` | `GitHub-Stars/` | 仅开启 Vault 同步时填写 |
+
+`TEST_LIMIT` 不需要创建成 Variable。它来自手动运行工作流时的 `test_limit` 输入框。
+
+**常用 AI 服务商示例**
+
+| 服务商 | `AI_BASE_URL` | `AI_MODEL` | 并发建议 |
+| --- | --- | --- | --- |
+| MiniMax 中国大陆 | `https://api.minimaxi.com/v1` | `MiniMax-M3` | Token Plan 全量同步建议 `1` |
+| DeepSeek | `https://api.deepseek.com` | 使用控制台当前可用模型，例如 `deepseek-v4-flash` | 可从 `5` 开始 |
+| OpenAI | `https://api.openai.com/v1` | 使用账号可用模型 | 按账号限额调整 |
+
+API Key 必须与服务区域和 Base URL 匹配。MiniMax 中国大陆 Key 与国际站 Key 不可混用；其他中转或兼容服务请使用其文档提供的 Base URL 和模型 ID。
+
+> [!NOTE]
+> “OpenAI 兼容”只表示基础请求格式兼容，不表示所有扩展参数都相同。`response_format`、`thinking`、推理内容字段和限流规则均可能因服务商或模型而异。例如 DeepSeek 与 MiniMax-M3 都支持各自的思考开关，但它不是通用 OpenAI 参数；不要在未核对服务商文档时直接复制扩展参数。
 
 > [!TIP]
 > **关于 GitHub API 限制**：
@@ -125,19 +155,33 @@ schedule:
 
 ## 配置项详解
 
-| 变量名               | 类型     | 说明                       | 默认值                      |
-| -------------------- | -------- | -------------------------- | --------------------------- |
-| `GH_USERNAME`        | 必填     | 要同步的 GitHub 用户名     | -                           |
-| `AI_API_KEY`         | 必填     | AI 接口 Key                | -                           |
-| `AI_BASE_URL`        | 可选     | OpenAI 兼容接口地址        | `https://api.openai.com/v1` |
-| `AI_MODEL`           | 可选     | 使用的 AI 模型             | `gpt-4o-mini`               |
-| `OUTPUT_FILENAME`    | 可选     | 生成 MD/HTML 的文件名基准  | `stars`                     |
-| `VAULT_SYNC_ENABLED` | 可选     | 是否开启 Obsidian 同步     | `false`                     |
-| `VAULT_REPO`         | 选填     | Vault 仓库 (`owner/repo`)  | -                           |
-| `VAULT_SYNC_PATH`    | 可选     | Vault 同步的目录路径       | `GitHub-Stars/`             |
-| `PAGES_SYNC_ENABLED` | 可选     | 是否开启 GitHub Pages 部署 | `true`                      |
-| `MAX_CONCURRENCY`    | 可选     | AI 并发处理数 (建议 1-10)  | `1`                         |
-| `GH_TOKEN`           | **建议** | 提升 API 额度，防止限速    | -                           |
+下表中的“脚本默认值”适用于本地运行时未设置对应环境变量的情况。GitHub Actions 工作流会把缺失的 Repository Variable 注入为空字符串，因此 Actions 用户应按“第二步”显式创建基础 Variables。
+
+| 变量名 | GitHub Actions 存放位置 | 必要性 | 说明 | 脚本默认值 |
+| --- | --- | --- | --- | --- |
+| `GH_USERNAME` | Repository Variable | 必填 | 要同步的 GitHub 用户名 | - |
+| `AI_API_KEY` | Repository Secret | 必填 | AI 接口 Key | - |
+| `AI_BASE_URL` | Repository Variable | Actions 必填 | OpenAI 兼容接口地址 | `https://api.openai.com/v1` |
+| `AI_MODEL` | Repository Variable | Actions 必填 | 使用的 AI 模型 ID | `gpt-4o-mini` |
+| `OUTPUT_FILENAME` | Repository Variable | Actions 建议显式设置 | Markdown 文件名基准 | `stars` |
+| `MAX_CONCURRENCY` | Repository Variable | 建议显式设置 | AI 并发处理数；Token Plan 建议 `1` | `5` |
+| `VAULT_SYNC_ENABLED` | Repository Variable | 可选 | 是否开启 Obsidian 同步 | `false` |
+| `VAULT_REPO` | Repository Variable | 开启 Vault 时必填 | Vault 仓库 (`owner/repo`) | - |
+| `VAULT_SYNC_PATH` | Repository Variable | 可选 | Vault 目标目录 | `GitHub-Stars/` |
+| `VAULT_PAT` | Repository Secret | 开启 Vault 时必填 | 目标仓库写入 Token | - |
+| `PAGES_SYNC_ENABLED` | Repository Variable | 发布网页时必填 | 只有值严格等于 `true` 才部署 Pages | `false` |
+| `GH_TOKEN` | 仅本地 `.env` | 本地建议 | 提升本地 GitHub API 额度；Actions 使用自动生成的 `GITHUB_TOKEN` | - |
+| `TEST_LIMIT` | Workflow 输入 / 本地 `.env` | 可选 | 单次最多处理多少个新项目；Actions 中不要创建同名 Variable | - |
+
+### 全量同步与 AI 限流
+
+首次全量同步可能产生数百次 AI 请求。订阅制或 Token Plan API 常按并发数、RPM、TPM 或滚动窗口限流；即使 Action 最终成功，部分仓库也可能显示“生成失败”。建议：
+
+1. 首次验证使用 `force_rebuild=true`、`test_limit=5`。
+2. 验证 Pages 与 AI 输出正常后，改用 `force_rebuild=false`，每次将 `test_limit` 设为 `20`～`50` 分批追加。
+3. MiniMax Token Plan 等订阅接口将 `MAX_CONCURRENCY` 设为 `1`；按量付费且额度充足时再逐步提高。
+4. 遇到 HTTP 429 时先停止新任务，等待服务商限流窗口恢复，再以 `force_rebuild=false` 重跑。正常完成的任务会从 `gh-pages/data/stars.json` 增量恢复；**取消正在运行的 Action 可能丢失本轮尚未保存的数据**。
+5. 全量完成后，日常定时任务只会为新增 Star 调用 AI，负载会明显降低。
 
 ---
 
@@ -173,15 +217,19 @@ schedule:
 
 本项目自动生成支持多语言、支持实时搜索的静态网页：
 
-1. 确保 `PAGES_SYNC_ENABLED=true`。
-2. 运行一次 Action 后，进入 **Settings -> Pages**。
-3. **Branch** 选择 `gh-pages`，目录选择 `/(root)`，保存。
+1. 在 Repository Variables 中显式设置 `PAGES_SYNC_ENABLED=true`。当前脚本默认值为 `false`；未配置时部署步骤会显示 **Skipped**，但整个 Action 仍可能显示成功。
+2. Fork 后第一次运行建议选择 `force_rebuild=true`、`test_limit=5`，清除 Fork 继承的原作者数据并验证部署。
+3. 确认 Action 中“部署到 GitHub Pages”步骤实际执行成功，然后进入 **Settings → Pages**。
+4. **Source** 选择 `Deploy from a branch`，**Branch** 选择 `gh-pages`，目录选择 `/(root)`，保存。
+5. 等待 1～5 分钟，通过 `https://<你的用户名>.github.io/<仓库名>/` 访问。例如仓库 `van14shu/GithubStarsIndex` 对应 `https://van14shu.github.io/GithubStarsIndex/`。
+6. 测试成功后使用 `force_rebuild=false`、`test_limit` 留空或分批运行，补齐剩余 Stars。
 
 > [!IMPORTANT]
 > **数据源迁移说明（兼容 Fork）**：
 > - 当前推荐的数据源为 `gh-pages/data/stars.json`。
 > - `main` 分支中的 `data/stars.json` 仅用于首次迁移兼容（例如 Fork 后第一次运行 Action 的回退读取）。
 > - 常规运行不会再把 `data/stars.json` 提交回 `main`。
+> - Fork 可能同时继承原仓库的 `gh-pages` 分支。若首次运行没有启用 Pages 或部署步骤被跳过，访问自己的 Pages 地址仍会看到原作者页面；使用 `force_rebuild=true` 并确认部署步骤成功即可替换。
 
 ---
 

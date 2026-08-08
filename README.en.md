@@ -8,7 +8,7 @@ English | [中文](README.md)
 
 - [Features](#features)
 - [Quick Start](#quick-start)
-- [Configuration Reference (Environment Variables / .env)](#configuration-reference-environment-variables--env)
+- [Configuration Reference](#configuration-reference)
 - [Obsidian Sync (Optional)](#obsidian-sync-optional)
 - [Local Installation](#local-installation)
 
@@ -75,25 +75,55 @@ Click the **Fork** button in the top right corner to copy this repository to you
 > [!IMPORTANT]
 > This site template includes the `analytics.1step.dev` analytics script with `data-website-id` set to `GitHubStarsIndex`. After forking, change it to your own website ID or remove the script at the bottom of `templates/index.html.j2` so your traffic does not appear in the original project dashboard.
 
-### Step 2: Configure Environment (Choose One)
+### Step 2: Configure the Runtime (Choose One)
 
-This project is driven by environment variables. **Priority: GitHub Secrets > .env file**.
+The project is driven by environment variables. Script configuration precedence is **built-in defaults < `config.yml` < environment variables**; a local `.env` file is loaded into the environment. GitHub Actions injects Repository Secrets/Variables as environment variables through the workflow.
 
-#### Method A: Using GitHub Environment Variables (Recommended for continuous running)
+#### Method A: GitHub Actions (Recommended for continuous runs)
 
-Go to **Settings → Secrets and variables → Actions** in your repository:
+Open **Settings → Secrets and variables → Actions** in your fork.
 
-**🔐 Required Secrets/Variables**
-- `GH_USERNAME`: The GitHub username whose stars you want to crawl.
-- `AI_API_KEY`: Your AI interface API Key.
+> [!IMPORTANT]
+> - **Secrets** store sensitive API keys and tokens and are read with `${{ secrets.NAME }}`. **Variables** store non-sensitive usernames, model IDs, URLs, and switches and are read with `${{ vars.NAME }}`. They are separate namespaces; a Secret named `GH_USERNAME` does not satisfy `vars.GH_USERNAME`.
+> - The current workflow does not declare `environment:`, so create **Repository secrets / Repository variables**, not Environment-level entries.
+> - A missing Repository Variable is passed to the workflow as an empty string. Explicitly create the base Variables below so empty values do not override script defaults.
 
-**📋 Optional Variables**
-These have built-in defaults and usually don't need configuration:
-- `AI_BASE_URL`: AI API endpoint (defaults to OpenAI).
-- `AI_MODEL`: Model name (defaults to `gpt-4o-mini`).
-- `OUTPUT_FILENAME`: Base name for generated files (defaults to `stars`).
-- `VAULT_SYNC_PATH`: Save directory in your Vault (defaults to `GitHub-Stars/`).
-- `PAGES_SYNC_ENABLED`: Whether to sync to Pages (defaults to `true`).
+**Repository secrets**
+
+| Name | Required | Description |
+| --- | --- | --- |
+| `AI_API_KEY` | Yes | API key for the selected AI provider |
+| `VAULT_PAT` | Conditional | Required only for cross-repository Obsidian sync; needs Contents: Write on the target repository |
+| `GITHUB_TOKEN` | Do not create | GitHub Actions creates one for every job and the workflow injects it automatically |
+
+**Repository variables**
+
+| Name | Recommended value | Description |
+| --- | --- | --- |
+| `GH_USERNAME` | Your GitHub username | Account whose Stars will be fetched; this must be a Variable |
+| `AI_BASE_URL` | See provider examples below | OpenAI-compatible API endpoint |
+| `AI_MODEL` | See provider examples below | Model ID exposed by the provider |
+| `MAX_CONCURRENCY` | `1` | Start at 1 for the first full sync or subscription/Token Plan APIs |
+| `OUTPUT_FILENAME` | `stars` | Generates `stars_zh.md` / `stars_en.md` |
+| `PAGES_SYNC_ENABLED` | `true` | Publish GitHub Pages; the site is not deployed when this is missing |
+| `VAULT_SYNC_ENABLED` | `false` | Enable Obsidian Vault sync |
+| `VAULT_REPO` | `owner/repo` | Required only when Vault sync is enabled |
+| `VAULT_SYNC_PATH` | `GitHub-Stars/` | Required only when Vault sync is enabled |
+
+Do not create a `TEST_LIMIT` Repository Variable. In Actions it comes from the `test_limit` input shown when manually running the workflow.
+
+**Common AI provider examples**
+
+| Provider | `AI_BASE_URL` | `AI_MODEL` | Concurrency guidance |
+| --- | --- | --- | --- |
+| MiniMax Mainland China | `https://api.minimaxi.com/v1` | `MiniMax-M3` | Use `1` for Token Plan full syncs |
+| DeepSeek | `https://api.deepseek.com` | Use a model currently available to your account, for example `deepseek-v4-flash` | Start at `5` |
+| OpenAI | `https://api.openai.com/v1` | Use a model available to your account | Adjust to account limits |
+
+The API key must match the service region and Base URL. MiniMax Mainland China and global keys are not interchangeable. For gateways or other compatible providers, use the Base URL and model ID documented by that provider.
+
+> [!NOTE]
+> “OpenAI-compatible” describes the basic request shape, not universal support for every extension. `response_format`, `thinking`, reasoning fields, and rate-limit policies vary by provider and model. DeepSeek and MiniMax-M3, for example, each expose a thinking toggle, but it is not a universal OpenAI parameter. Do not copy provider-specific extensions without checking that provider's documentation.
 
 > [!TIP]
 > **About GitHub API Limits**:
@@ -124,19 +154,33 @@ Go to **Actions → 🌟 GitHub Stars Index 同步 → Run workflow** and click 
 
 ## Configuration Reference
 
-| Variable             | Type                     | Description                                   | Default Value               |
-| -------------------- | ------------------------ | --------------------------------------------- | --------------------------- |
-| `GH_USERNAME`        | Required                 | GitHub username to sync                       | -                           |
-| `AI_API_KEY`         | Required                 | AI API Key                                    | -                           |
-| `AI_BASE_URL`        | Optional                 | OpenAI-compatible API endpoint                | `https://api.openai.com/v1` |
-| `AI_MODEL`           | Optional                 | AI model to use                               | `gpt-4o-mini`               |
-| `OUTPUT_FILENAME`    | Optional                 | Base name for generated MD/HTML files         | `stars`                     |
-| `VAULT_SYNC_ENABLED` | Optional                 | Whether to enable Obsidian sync               | `false`                     |
-| `VAULT_REPO`         | Optional                 | Vault repository (`owner/repo`)               | -                           |
-| `VAULT_SYNC_PATH`    | Optional                 | Directory path for Vault sync                 | `GitHub-Stars/`             |
-| `PAGES_SYNC_ENABLED` | Optional                 | Whether to deploy to GitHub Pages             | `true`                      |
-| `MAX_CONCURRENCY`    | Optional                 | AI concurrency limit (recommended 1-10)       | `1`                         |
-| `GH_TOKEN`           | **Strongly Recommended** | Increases API limits to prevent rate-limiting | -                           |
+The “script default” column applies to local runs where the corresponding environment variable is absent. The GitHub Actions workflow injects missing Repository Variables as empty strings, so Actions users should explicitly create the base Variables listed in Step 2.
+
+| Variable | GitHub Actions location | Requirement | Description | Script default |
+| --- | --- | --- | --- | --- |
+| `GH_USERNAME` | Repository Variable | Required | GitHub username to sync | - |
+| `AI_API_KEY` | Repository Secret | Required | AI API key | - |
+| `AI_BASE_URL` | Repository Variable | Required in Actions | OpenAI-compatible endpoint | `https://api.openai.com/v1` |
+| `AI_MODEL` | Repository Variable | Required in Actions | AI model ID | `gpt-4o-mini` |
+| `OUTPUT_FILENAME` | Repository Variable | Explicit value recommended in Actions | Markdown filename base | `stars` |
+| `MAX_CONCURRENCY` | Repository Variable | Explicit value recommended | Concurrent AI requests; use `1` for Token Plans | `5` |
+| `VAULT_SYNC_ENABLED` | Repository Variable | Optional | Enable Obsidian sync | `false` |
+| `VAULT_REPO` | Repository Variable | Required with Vault sync | Vault repository (`owner/repo`) | - |
+| `VAULT_SYNC_PATH` | Repository Variable | Optional | Target directory in the Vault | `GitHub-Stars/` |
+| `VAULT_PAT` | Repository Secret | Required with Vault sync | Token with write access to the target repository | - |
+| `PAGES_SYNC_ENABLED` | Repository Variable | Required to publish the site | Pages deploys only when the value is exactly `true` | `false` |
+| `GH_TOKEN` | Local `.env` only | Recommended locally | Raises local GitHub API limits; Actions uses its generated `GITHUB_TOKEN` | - |
+| `TEST_LIMIT` | Workflow input / local `.env` | Optional | Maximum new repositories per run; do not create an Actions Variable with this name | - |
+
+### Full Syncs and AI Rate Limits
+
+An initial full sync may issue hundreds of AI requests. Subscription or Token Plan APIs commonly enforce concurrency, RPM, TPM, or rolling-window limits. A workflow can finish successfully while some repositories contain “Generation failed.” Recommended procedure:
+
+1. Validate the first run with `force_rebuild=true` and `test_limit=5`.
+2. After AI output and Pages deployment work, use `force_rebuild=false` and append `20`–`50` repositories per run with `test_limit`.
+3. Set `MAX_CONCURRENCY=1` for MiniMax Token Plan and similar subscription APIs. Increase it gradually only for pay-as-you-go APIs with sufficient limits.
+4. On HTTP 429, stop starting new runs, wait for the provider's rate-limit window to recover, then rerun with `force_rebuild=false`. Completed runs resume incrementally from `gh-pages/data/stars.json`; **cancelling an active Action may lose results that have not yet been saved in that run**.
+5. After the initial import, scheduled runs call the AI only for newly starred repositories, so normal load is much lower.
 
 ---
 
@@ -172,15 +216,19 @@ This feature allows you to automatically push the generated star summaries to yo
 
 This project automatically generates multi-language static web pages with real-time search functionality.
 
-1. Ensure `PAGES_SYNC_ENABLED=true`.
-2. After running the Action once, go to **Settings -> Pages**.
-3. Select `gh-pages` branch and `/(root)` directory, then click Save.
+1. Explicitly set the Repository Variable `PAGES_SYNC_ENABLED=true`. The current script default is `false`; when the variable is missing, the deploy step is **Skipped** even though the overall Action may still appear successful.
+2. On the first run after a fork, use `force_rebuild=true` and `test_limit=5` to remove inherited data from the upstream repository and validate deployment.
+3. Confirm that the “Deploy to GitHub Pages” step actually ran successfully, then open **Settings → Pages**.
+4. Set **Source** to `Deploy from a branch`, select the `gh-pages` branch and `/(root)` folder, then save.
+5. Wait 1–5 minutes and open `https://<username>.github.io/<repository>/`. For example, `van14shu/GithubStarsIndex` maps to `https://van14shu.github.io/GithubStarsIndex/`.
+6. After the test succeeds, use `force_rebuild=false` with an empty `test_limit` or continue in batches to import the remaining Stars.
 
 > [!IMPORTANT]
 > **Data Source Migration (Compatibility for Forks)**:
 > - The current recommended data source is `gh-pages/data/stars.json`.
 > - `data/stars.json` in the `main` branch is only used for initial migration compatibility.
 > - Normal runs will no longer commit `data/stars.json` back to the `main` branch.
+> - A fork may inherit the upstream `gh-pages` branch. If the first run does not enable Pages or the deploy step is skipped, your Pages URL will still show the original author's site. Run with `force_rebuild=true` and confirm a successful deploy to replace it.
 
 ---
 
