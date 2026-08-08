@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-08 22:48 UTC",
+  "last_updated": "2026-08-08 23:05 UTC",
   "repos": {
     "mastra-ai/mastra": {
       "metadata": {
@@ -31,19 +31,17 @@
         "starred_at": "2026-08-06T01:23:21Z"
       },
       "summary": {
-        "zh": "Mastra是基于TypeScript的现代化AI代理开发框架，集成40+模型路由、图工作流编排、人机协作、上下文记忆及MCP服务器等核心能力。它支持React、Next.js、Node.js前后端无缝集成，内置评估与可观测性工具，帮助开发者从原型快速构建生产级AI智能体应用。",
-        "en": "Mastra is a modern TypeScript framework for building AI-powered applications and agents. It offers unified model routing across 40+ LLM providers, a graph-based workflow engine, autonomous agents with tool use, human-in-the-loop support, context management with memory and RAG, and MCP server capabilities. It integrates with React, Next.js, and Node.js, providing built-in evaluation and observability for production-grade AI development.",
+        "zh": "Mastra 是一个基于 TypeScript 的现代 AI 应用与智能体开发框架。它提供统一模型路由（支持40+模型供应商）、自主智能体、可视化工作流引擎、人机协同、上下文管理、MCP 服务端支持，以及内置评估与可观测性，帮助开发者从原型快速构建到生产级 AI 应用，并能无缝集成 React、Next.js 和 Node.js 等生态。",
+        "en": "Mastra is a modern TypeScript framework for building AI-powered applications and agents. It offers a unified interface to 40+ LLM providers, autonomous agents, a graph-based workflow engine, human-in-the-loop support, context management, MCP server authoring, and built-in evals and observability—enabling developers to go from prototype to production reliably and integrate with React, Next.js, and Node.js.",
         "tags_zh": [
+          "AI应用框架",
           "AI智能体",
-          "MCP协议",
-          "TypeScript框架",
-          "工作流编排"
+          "TypeScript"
         ],
         "tags_en": [
           "AI Agents",
-          "MCP",
-          "TypeScript Framework",
-          "Workflow Orchestration"
+          "AI Framework",
+          "TypeScript"
         ]
       },
       "pushed_at": "2026-08-08T22:35:18Z",
@@ -83,22 +81,56 @@
         "starred_at": "2026-08-06T01:21:05Z"
       },
       "summary": {
-        "zh": "系统性AI智能体实战教程，覆盖LangChain、LangGraph、Coze、Dify、MCP、RAG等主流技术栈，提供完整学习路径、可运行源码、企业级实战项目（电商问数、深度研搜）及面试题库，对标大模型应用开发工程师岗位，从零基础到企业级落地一体化。",
-        "en": "A systematic AI Agent tutorial covering LangChain, LangGraph, Coze, Dify, MCP, and RAG. Features runnable source code, enterprise-grade projects (NL2SQL, multi-agent deep search), interview question bank, and a complete learning path from zero to deployment, targeting AI application engineer roles in 2026.",
+        "zh": "这个仓库是一套系统的AI Agent实战教程，从零基础到企业级落地，覆盖LangChain、LangGraph、Coze、Dify、MCP、RAG等技术，包含完整学习路径、可运行源码、实战项目和面试题库，对标大模型应用开发工程师岗位，适合系统学习。",
+        "en": "This repository is a systematic AI Agent practical tutorial from zero to enterprise-level deployment, covering LangChain, LangGraph, Coze, Dify, MCP, RAG, and more. It includes a complete learning path, runnable source code, practical projects, and interview question bank, targeting LLM application development engineer roles.",
         "tags_zh": [
           "AI智能体",
           "LangChain 框架",
-          "大模型应用开发",
+          "LangGraph",
           "实战教程"
         ],
         "tags_en": [
           "AI 智能体",
-          "LLM Application",
           "LangChain 框架",
+          "LangGraph",
           "技术教程"
         ]
       },
       "pushed_at": "2026-06-23T16:29:23Z",
+      "updated_at": "2026-08-08"
+    },
+    "Callous-0923/agent-study": {
+      "metadata": {
+        "full_name": "Callous-0923/agent-study",
+        "name": "agent-study",
+        "owner": "Callous-0923",
+        "description": "36章AI Agent全栈课程：从ReAct循环到Claude Code逆向、MCP/A2A协议、RAG、DSPy、生产可观测性——全部为可运行Python文件，面试导向。",
+        "stars": 436,
+        "language": "HTML",
+        "url": "https://github.com/Callous-0923/agent-study",
+        "homepage": "https://agent-study-ruddy.vercel.app",
+        "topics": [],
+        "pushed_at": "2026-05-28T12:39:24Z",
+        "updated_at": "2026-08-08T01:29:53Z",
+        "starred_at": "2026-08-06T01:25:00Z"
+      },
+      "summary": {
+        "zh": "这是一套面向求职的AI Agent全栈学习课程，共36章，系统讲解从ReAct循环等基础理论到Claude Code逆向、MCP/A2A协议、RAG、DSPy及生产可观测性等前沿实践。全课程包含22000+行代码和60+个可独立运行的Python示例，按7个层次递进，适合应届生、转行者及开发者系统掌握AI Agent。",
+        "en": "A 36-chapter full-stack AI Agent course designed for job interviews, systematically covering core theories and engineering practices from ReAct loops to Claude Code reverse engineering, MCP/A2A protocols, RAG, DSPy, and production observability. With 22,000+ lines of code and 60+ runnable Python examples across 7 progressive levels, it suits graduates, career changers, and developers.",
+        "tags_zh": [
+          "AI智能体",
+          "MCP",
+          "RAG 检索增强",
+          "面试准备"
+        ],
+        "tags_en": [
+          "AI 智能体",
+          "Interview Prep",
+          "MCP",
+          "RAG 检索增强"
+        ]
+      },
+      "pushed_at": "2026-05-28T12:39:24Z",
       "updated_at": "2026-08-08"
     },
     "KunAgent/Kun": {
@@ -137,19 +169,19 @@
         "starred_at": "2026-08-08T17:03:34Z"
       },
       "summary": {
-        "zh": "Kun 是本地优先的 AI Agent 工作台，将桌面 GUI 与终端 TUI 共享同一运行时，覆盖编程、写作、设计、研究与自动化五大场景。支持多模型接入、Agent Graph 多智能体编排、MCP 协议与定时任务，跨 macOS、Windows、Linux 平台，会话数据默认本地存储。",
-        "en": "Kun is a local-first AI Agent workspace that unifies a desktop GUI and terminal TUI on a single shared runtime, delivering end-to-end task traceability from clarification through execution to delivery. It spans five integrated workflows—coding, writing, design, research, and automation—and provides multi-model provider compatibility, Agent Graph multi-agent orchestration, MCP protocol integration, and Schedule/Loop/Hook automation primitives. Available across macOS, Windows, and Linux with sessions, preferences, and runtime data stored locally by default for privacy and offline access.",
+        "zh": "Kun 是一个本地优先的 AI Agent 工作台，通过共享运行时统一桌面 GUI 与终端 TUI。它支持代码、写作、设计、研究和自动化场景，提供从需求澄清、计划执行到审查交付的完整工作流。亮点包括多模型接入、Agent Graph 分工、自动化调度及跨平台支持，数据默认保存在本机。",
+        "en": "Kun is a local-first AI agent workspace that unifies desktop GUI and terminal TUI on a shared runtime. It covers coding, writing, design, research, and automation, delivering an end-to-end workflow from requirement clarification to review and delivery. Highlights include multi-model support, Agent Graph orchestration, automation scheduling, cross-platform availability, and local-first data storage.",
         "tags_zh": [
           "AI智能体",
           "本地优先",
           "自动化工具",
-          "跨平台桌面应用"
+          "跨平台"
         ],
         "tags_en": [
           "AI 智能体",
           "Automation Tool",
-          "Cross-Platform Desktop App",
-          "Local-First"
+          "Cross-platform",
+          "Local-first"
         ]
       },
       "pushed_at": "2026-08-07T18:08:38Z",
@@ -182,54 +214,20 @@
         "starred_at": "2026-08-07T07:27:35Z"
       },
       "summary": {
-        "zh": "Vibe-Trading 是一款AI驱动的个人交易智能体框架，一行命令即可为智能体赋能完整交易能力。集成 FastAPI 后端、React 19 前端与 Electron 桌面端，支持 eToro 等多平台券商接口，提供影子账户模拟交易、原子化再平衡回测与 MCP API 服务，面向 AI 代理自动化交易场景。",
-        "en": "Vibe-Trading is an AI-powered personal trading agent framework that empowers agents with comprehensive trading capabilities via a single command. It integrates a FastAPI backend, React 19 frontend, and Electron desktop shell, supporting multi-broker integration (eToro), shadow paper-trading accounts, atomic rebalancing backtesting, and MCP API server, designed for AI-agent-driven automated trading workflows.",
+        "zh": "Vibe-Trading是由HKUDS开发的开源个人交易代理，通过单条命令赋予智能体全面的交易能力。它集成了多种交易平台接口，支持自动化交易、策略回测、影子账户等功能，采用Python、FastAPI和React构建，提供API和MCP支持，适合量化交易与个人投资者。",
+        "en": "Vibe-Trading is an open-source personal trading agent from HKUDS that empowers agents with comprehensive trading capabilities via a single command. It integrates multiple trading platform interfaces, supports automated trading, strategy backtesting, and shadow accounts, built with Python, FastAPI, and React, offering API and MCP support for quantitative trading and individual investors.",
         "tags_zh": [
           "AI智能体",
-          "FastAPI",
-          "自动化工具",
+          "自动化交易",
           "量化交易"
         ],
         "tags_en": [
           "AI 智能体",
-          "FastAPI",
-          "Quantitative Trading",
-          "自动化工具"
+          "Automated Trading",
+          "Quantitative Trading"
         ]
       },
       "pushed_at": "2026-08-08T17:25:08Z",
-      "updated_at": "2026-08-08"
-    },
-    "Callous-0923/agent-study": {
-      "metadata": {
-        "full_name": "Callous-0923/agent-study",
-        "name": "agent-study",
-        "owner": "Callous-0923",
-        "description": "36章AI Agent全栈课程：从ReAct循环到Claude Code逆向、MCP/A2A协议、RAG、DSPy、生产可观测性——全部为可运行Python文件，面试导向。",
-        "stars": 436,
-        "language": "HTML",
-        "url": "https://github.com/Callous-0923/agent-study",
-        "homepage": "https://agent-study-ruddy.vercel.app",
-        "topics": [],
-        "pushed_at": "2026-05-28T12:39:24Z",
-        "updated_at": "2026-08-08T01:29:53Z",
-        "starred_at": "2026-08-06T01:25:00Z"
-      },
-      "summary": {
-        "zh": "36章AI Agent全栈课程，覆盖从ReAct循环、LangChain/LangGraph框架到Claude Code逆向、MCP/A2A协议、RAG与DSPy等核心主题，每章均为可独立运行的Python文件，分7层递进，含22000+行代码与60+示例，配套在线文档，专为求职者面试打造。",
-        "en": "A comprehensive 36-chapter AI Agent full-stack course covering ReAct loops, LangChain/LangGraph frameworks, Claude Code reverse engineering, MCP/A2A protocols, RAG deep-dive, and DSPy. Each chapter is a runnable Python file organized across 7 progressive layers, featuring 22,000+ lines of code, 60+ examples, online documentation, and interview-oriented content for job seekers.",
-        "tags_zh": [
-          "AI智能体",
-          "大语言模型",
-          "面试指南"
-        ],
-        "tags_en": [
-          "AI 大模型",
-          "AI 智能体",
-          "Interview Guide"
-        ]
-      },
-      "pushed_at": "2026-05-28T12:39:24Z",
       "updated_at": "2026-08-08"
     }
   }
