@@ -231,6 +231,33 @@ schedule:
 > - 常规运行不会再把 `data/stars.json` 提交回 `main`。
 > - Fork 可能同时继承原仓库的 `gh-pages` 分支。若首次运行没有启用 Pages 或部署步骤被跳过，访问自己的 Pages 地址仍会看到原作者页面；使用 `force_rebuild=true` 并确认部署步骤成功即可替换。
 
+### 使用自定义域名（可选）
+
+下面以保留示例域名 `stars.example.com` 为例；配置时请替换为你实际拥有的域名。
+
+1. 进入仓库的 **Settings → Pages**，在 **Custom domain** 中填写 `stars.example.com` 并保存。
+2. 在域名的 DNS 服务商中添加以下记录：
+
+   | 类型 | 名称 | 目标 | 代理状态 |
+   | --- | --- | --- | --- |
+   | `CNAME` | `stars` | `YOUR_USERNAME.github.io` | 首次配置建议使用 `DNS only` |
+
+   CNAME 目标只能填写 `YOUR_USERNAME.github.io`，不要包含 `https://`、仓库名或路径。
+
+3. 本项目部署时会用 `clean: true` 重建 `gh-pages` 分支，因此必须让工作流每次都生成 `dist/CNAME`。在 `.github/workflows/sync.yml` 的“准备 gh-pages 发布目录”步骤中加入：
+
+   ```bash
+   printf '%s\n' 'stars.example.com' > dist/CNAME
+   ```
+
+   `CNAME` 文件必须位于发布目录根部，并且只能包含一个域名。
+
+4. 提交修改后，进入 **Actions** 手动运行一次同步工作流，确认 `gh-pages` 分支根目录包含 `CNAME` 文件。
+5. 等待 GitHub Pages 显示 **DNS check successful**。GitHub 完成 TLS 证书签发后，勾选 **Enforce HTTPS**。证书签发期间该选项可能暂时置灰；DNS 传播最长可能需要 24 小时。
+
+> [!TIP]
+> 建议先在 GitHub 个人账号的 **Settings → Pages** 中验证根域名，并按页面提示在 DNS 服务商处添加 TXT 记录，以降低域名被其他 GitHub Pages 仓库占用的风险。
+
 ---
 
 ## Docker 部署
