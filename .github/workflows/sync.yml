@@ -133,7 +133,7 @@ jobs:
           test -s data/stars.json || { echo "❌ 未找到有效 data/stars.json"; exit 1; }
           mkdir -p dist/data
           cp data/stars.json dist/data/stars.json
-          printf '%s\n' 'start.vai14.com' > dist/CNAME
+          printf '%s\n' 'stars.vai14.com' > dist/CNAME
           echo "✅ 已写入 dist/data/stars.json 和 dist/CNAME（仅发布到 gh-pages，不提交 main）"
 
       # ── 7. 部署到 GitHub Pages ─────────────────────────────
